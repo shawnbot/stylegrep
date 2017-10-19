@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 const chalk = require('chalk')
-const {parseFile, stringify} = require('sast')
+const {stringify} = require('sast')
 const {search} = require('./index')
 const {parseInput} = require('./src/io')
-require('epipebomb')()
 
 const yargs = require('yargs')
   .usage('$0 [options] pattern [glob..]')
@@ -43,12 +42,20 @@ const yargs = require('yargs')
     desc: 'Just like :not(:has(selector))',
     type: 'string',
   })
+  .option('count', {
+    desc: 'Only include nodes for which the number of matched descendants is exactly the given count',
+    type: 'array',
+    nargs: 2,
+  })
   .demand(1, 'You must provide a search selector')
   .strict(true)
 
 const options = yargs.argv
 const args = options._
 const pattern = args.shift()
+
+// prevent EPIPE errors when you pipe to `head -10`, etc.
+require('epipebomb')()
 
 const die = error => {
   console.error(error)

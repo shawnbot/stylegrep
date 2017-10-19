@@ -21,7 +21,7 @@ const groupBy = (list, keyFunction) => {
 }
 
 const search = (tree, selector, options) => {
-  const {context, verbose, unique} = options
+  const {context, verbose, unique, limit} = options
 
   if (context) {
     tree = addParents(tree)
@@ -37,6 +37,10 @@ const search = (tree, selector, options) => {
         output: string,
       }
     })
+
+  if (limit > 0) {
+    results = results.slice(0, limit)
+  }
 
   const filter = createFilter(options)
   if (filter) {

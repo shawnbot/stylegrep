@@ -29,7 +29,12 @@ const yargs = require('yargs')
     type: 'boolean',
     alias: 'v',
   })
-  .group(['has', 'not'], 'Predicates:')
+  .option('limit', {
+    desc: 'Limit output to a given number of results',
+    type: 'number',
+    alias: 'L',
+  })
+  .group(['has', 'not', 'lacks', 'count'], 'Predicates:')
   .option('has', {
     desc: 'Only include nodes that contain at least one descendant that matches the given selector, a la :has(selector)',
     type: 'string',
@@ -64,7 +69,10 @@ const die = error => {
 
 parseInput(options, args)
   .then(trees => {
-    trees.forEach(tree => {
+    const limit = options.limit
+    let count = 0
+    let done = false
+    trees.some(tree => {
       const results = search(tree, pattern, options)
       const cwd = process.cwd()
       if (results.length) {
@@ -73,14 +81,14 @@ parseInput(options, args)
           ? source.substr(cwd.length)
           : source
         console.warn('%s:', chalk.green(relativeSource))
-        results.forEach(result => {
+        done = results.some(result => {
           console.log(result.output)
+          if (++count == limit) return true
         })
       } else {
-        if (options.verbose) {
-          console.warn('%s: 0 results', chalk.yellow(tree.source))
-        }
+        // console.warn('%s: 0 results', chalk.yellow(tree.source))
       }
+      return done
     })
   })
   .catch(die)

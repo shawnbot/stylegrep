@@ -14,10 +14,13 @@ const yargs = require('yargs')
     alias: 's',
   })
   .option('context', {
-    desc: 'How much context to show',
-    default: 0,
-    type: 'number',
+    desc: 'How many parent levels to ascend before showing output, or a selector at which to stop',
     alias: 'c',
+    coerce: value => {
+      return (value && !isNaN(Number(value)))
+        ? Number(value)
+        : value
+    },
   })
   .option('unique', {
     desc: 'Only list unique values',

@@ -1,5 +1,6 @@
 const addParents = require('unist-util-parents')
 const chalk = require('chalk')
+const is = require('unist-util-is')
 const select = require('unist-util-select')
 const stringifyPosition = require('unist-util-stringify-position')
 const {createFilter, ascending, descending} = require('./src/predicates')
@@ -93,10 +94,23 @@ const search = (tree, selector, options) => {
   return results
 }
 
-const contextualize = (node, depth) => {
-  for (let i = 0; i < depth; i++) {
-    if (!node.parent) break
-    node = node.parent
+const contextualize = (node, selectorOrDepth) => {
+  if (typeof selectorOrDepth === 'number') {
+    const depth = selectorOrDepth
+    for (let i = 0; i < depth; i++) {
+      if (!node.parent) break
+      node = node.parent
+    }
+  } else {
+    const selector = selectorOrDepth
+    let parent = node
+    do {
+      if (is(selector, parent)) {
+        return parent
+      }
+      parent = parent.parent
+    } while (parent)
+    return parent || node
   }
   return node
 }

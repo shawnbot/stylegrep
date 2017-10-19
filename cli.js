@@ -5,7 +5,7 @@ const {search} = require('./index')
 const {parseInput} = require('./src/io')
 
 const yargs = require('yargs')
-  .usage('$0 [options] pattern [glob..]')
+  .usage('$0 [options] selector [predicates..] [files, glob..]')
   .version(require('./package.json').version)
   .option('syntax', {
     desc: 'Which syntax to parse the input file(s) as',
@@ -48,7 +48,7 @@ const yargs = require('yargs')
     type: 'string',
   })
   .option('count', {
-    desc: 'Only include nodes for which the number of matched descendants is exactly the given count',
+    desc: 'Only include nodes for which the number of matched descendants is exactly the given count, e.g. "--count variable 2"',
     type: 'array',
     nargs: 2,
   })

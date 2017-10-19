@@ -20,22 +20,30 @@ const find = (node, selector) => {
   }
 }
 
-const predicates = {
-  has:    selector => node => find(node, selector).length > 0,
-  lacks:  selector => node => find(node, selector).length === 0,
-  not:    selector => node => !is(selector, node),
-  count:  (selector, count) => node => find(node, selector).length == count,
-}
-
 const some = tests => d => tests.some(test => test(d))
 const every = tests => d => tests.every(test => test(d))
 const identity = v => () => v
 
+const predicates = {
+  has:    selector => node => find(node, selector).length > 0,
+  lacks:  selector => node => find(node, selector).length === 0,
+  not:    selector => node => !is(selector, node),
+  // note: this implies {nargs: 2} when we parse it in yargs
+  count:  (selector, count) => node => find(node, selector).length == count,
+}
+
 const predicate = (name, valueOrValues) => {
   const pred = predicates[name]
-  return Array.isArray(valueOrValues)
-    ? every(valueOrValues.map(pred))
-    : pred(valueOrValues)
+  if (Array.isArray(valueOrValues)) {
+    // `pred.length` is the number of arguments that the predicate function
+    // accepts. So if the predicate function accepts exactly the number of
+    // provided arguments, just pass those as positional arguments rather
+    // than every()'ing a predicate call for each one
+    return valueOrValues.length === pred.length
+      ? pred(...valueOrValues)
+      : every(valueOrValues.map(pred))
+  }
+  return pred(valueOrValues)
 }
 
 const createFilter = filters => {

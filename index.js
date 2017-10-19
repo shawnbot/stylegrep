@@ -20,14 +20,14 @@ const groupBy = (list, keyFunction) => {
     .map(([key, values]) => ({key, values, size: values.length}))
 }
 
-const search = (tree, pattern, options) => {
+const search = (tree, selector, options) => {
   const {context, verbose, unique} = options
 
   if (context) {
     tree = addParents(tree)
   }
 
-  let results = select(tree, pattern)
+  let results = select(tree, selector)
     .map((node, i) => {
       const string = stringify(node)
       return {
@@ -40,7 +40,7 @@ const search = (tree, pattern, options) => {
 
   const filter = createFilter(options)
   if (filter) {
-    results = results.filter(filter)
+    results = results.filter(({node}) => filter(node))
   }
 
   if (context) {
@@ -56,9 +56,10 @@ const search = (tree, pattern, options) => {
 
   if (verbose) {
     results.forEach(result => {
-      const {node, output} = result
-      const pos = stringifyPosition(node)
-      result.output = `${chalk.yellow(pos)} ${chalk.gray(node.type)} ${output}`
+      const {output} = result
+      const context = result.context || result.node
+      const pos = stringifyPosition(context)
+      result.output = `${output}\t${chalk.gray(context.type)}\t${chalk.yellow(pos)}`
     })
   }
 

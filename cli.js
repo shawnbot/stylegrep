@@ -14,10 +14,13 @@ const yargs = require('yargs')
     alias: 's',
   })
   .option('context', {
-    desc: 'How much context to show',
-    default: 0,
-    type: 'number',
+    desc: 'How many parent levels to ascend before showing output, or a selector at which to stop',
     alias: 'c',
+    coerce: value => {
+      return (value && !isNaN(Number(value)))
+        ? Number(value)
+        : value
+    },
   })
   .option('unique', {
     desc: 'Only list unique values',
@@ -75,18 +78,18 @@ parseInput(options, args)
     trees.some(tree => {
       const results = search(tree, pattern, options)
       const cwd = process.cwd()
+      const sourcePath = tree.source.path
+      const relativePath = sourcePath.indexOf(cwd) === 0
+        ? sourcePath.substr(cwd.length)
+        : sourcePath
       if (results.length) {
-        const {source} = tree
-        const relativeSource = source.indexOf(cwd) === 0
-          ? source.substr(cwd.length)
-          : source
-        console.warn('%s:', chalk.green(relativeSource))
+        console.warn('%s:', chalk.green(relativePath))
         done = results.some(result => {
           console.log(result.output)
           if (++count == limit) return true
         })
       } else {
-        // console.warn('%s: 0 results', chalk.yellow(tree.source))
+        // console.warn('%s: 0 results', chalk.yellow(relativePath))
       }
       return done
     })

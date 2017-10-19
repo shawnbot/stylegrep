@@ -77,7 +77,9 @@ parseInput(options, args)
           console.log(result.output)
         })
       } else {
-        console.warn('%s: 0 results', chalk.yellow(tree.source))
+        if (options.verbose) {
+          console.warn('%s: 0 results', chalk.yellow(tree.source))
+        }
       }
     })
   })

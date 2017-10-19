@@ -55,5 +55,10 @@ Options:
   --limit, -L    Limit output to a given number of results              [number]
 ```
 
+In `--verbose` mode, output is colored so that you can see where the originally
+selected node sits in the expanded context:
+
+![example image](https://user-images.githubusercontent.com/113896/31789529-3803a28a-b4c7-11e7-9b79-b1e041145f10.png)
+
 ## API
 Coming soon!

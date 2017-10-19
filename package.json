@@ -1,10 +1,14 @@
 {
   "name": "stylegrep",
   "version": "1.0.0",
-  "description": "",
+  "description": "Syntactical search for stylesheets",
   "main": "index.js",
+  "bin": {
+    "stylegrep": "cli.js"
+  },
   "dependencies": {
     "chalk": "^2.2.0",
+    "epipebomb": "^1.0.0",
     "globby": "^6.1.0",
     "sast": "^0.1.2",
     "unist-util-is": "^2.1.1",
@@ -17,6 +21,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Shawn Allen <shawn.allen@github.com>",
+  "license": "Unlicense"
 }

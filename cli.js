@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 const chalk = require('chalk')
-const globby = require('globby')
 const {parseFile, stringify} = require('sast')
 const {search} = require('./index')
+const {parseInput} = require('./src/io')
 require('epipebomb')()
 
 const yargs = require('yargs')
@@ -46,30 +46,26 @@ const yargs = require('yargs')
   .demand(1, 'You must provide a search selector')
   .strict(true)
 
-
 const options = yargs.argv
 const args = options._
 const pattern = args.shift()
-const globs = args.length ? args : '**/*.{css,sass,scss,less}'
 
-const parseFiles = files => {
-  const {syntax} = options
-  const parseOptions = {syntax}
-  return Promise.all(
-    files.map(file => {
-      console.warn('%s:', chalk.yellow('parsing'), file)
-      return parseFile(file, parseOptions)
-    })
-  )
+const die = error => {
+  console.error(error)
+  process.exit(1)
 }
 
-globby(globs)
-  .then(parseFiles)
+parseInput(options, args)
   .then(trees => {
     trees.forEach(tree => {
       const results = search(tree, pattern, options)
+      const cwd = process.cwd()
       if (results.length) {
-        console.warn('%s:', chalk.green(tree.source))
+        const {source} = tree
+        const relativeSource = source.indexOf(cwd) === 0
+          ? source.substr(cwd.length)
+          : source
+        console.warn('%s:', chalk.green(relativeSource))
         results.forEach(result => {
           console.log(result.output)
         })
@@ -78,7 +74,4 @@ globby(globs)
       }
     })
   })
-  .catch(error => {
-    console.error(error)
-    process.exit(1)
-  })
+  .catch(die)

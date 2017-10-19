@@ -38,13 +38,13 @@ const search = (tree, selector, options) => {
       }
     })
 
-  if (limit > 0) {
-    results = results.slice(0, limit)
-  }
-
   const filter = createFilter(options)
   if (filter) {
     results = results.filter(({node}) => filter(node))
+  }
+
+  if (limit > 0) {
+    results = results.slice(0, limit)
   }
 
   if (context) {
